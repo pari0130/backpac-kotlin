@@ -1,0 +1,112 @@
+plugins {
+    id 'org.springframework.boot' version '2.4.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.61'
+}
+
+group = 'com.task'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+def querydslSrcDir = "src/main/java/generated"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // QueryDSL
+    implementation "com.querydsl:querydsl-apt:4.4.0" // Querydsl 관련 코드(ex: QHello) 생성 기능 제공
+    implementation "com.querydsl:querydsl-jpa:4.4.0" // Querydsl JPA 관련 기능 제공
+    implementation "com.querydsl:querydsl-sql:4.4.0" // Querydsl JPA 관련 기능 제공
+
+    // db
+    compile 'com.zaxxer:HikariCP:3.4.5'
+    compile 'mysql:mysql-connector-java'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'it.ozimov:embedded-redis:0.7.2'
+
+    // swagger
+    implementation "io.springfox:springfox-swagger2:2.9.2"
+    implementation "io.springfox:springfox-swagger-ui:2.9.2"
+
+    // json
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.google.code.gson:gson'
+
+    // jwt
+    implementation "io.jsonwebtoken:jjwt:0.9.1"
+
+    // etc
+    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'org.apache.httpcomponents:httpclient'
+    implementation "net.rakugakibox.util:yaml-resource-bundle:1.1"
+    implementation 'org.apache.commons:commons-lang3'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+
+querydsl {
+    library = "com.querydsl:querydsl-apt:4.4.0"
+    jpa = true
+    querydslSourcesDir = querydslSrcDir
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', querydslSrcDir]
+        }
+    }
+}
+
+configurations {
+    querydsl.extendsFrom compileClasspath
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
+}
+
+clean {
+    delete file(querydslSrcDir)
+}
+
+test {
+    useJUnitPlatform()
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}

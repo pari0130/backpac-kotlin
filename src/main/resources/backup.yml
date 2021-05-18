@@ -1,0 +1,39 @@
+# dev 환경  postgres
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    hikari:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://3.137.213.162:3306/dev?serverTimezone=Asia/Seoul&useUnicode=true
+      username: devuser
+      password: devuser!234
+      poolName: HikariCP
+      connection-test-query : SELECT NOW() FROM dual
+    platform: mysql # datasource 타입 플랫폼 정의
+#    초기 데이터 설정이 필요할 경우 아래 주석 제거 필요
+#    initialization-mode: always
+#    schema: classpath:db/mysql/schema.sql
+#    data: classpath:db/mysql/data.sql
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update # update create-drop
+    generate-ddl: true
+    database: mysql
+  redis:
+    host: 127.0.0.1
+    port: 6379
+
+logging:
+  file:
+    name: logs/application-debug.log
+  pattern:
+    console: "%d %-5level %logger : %msg%n"
+    file: "%d %-5level [%thread] %logger : %msg%n"
+  level:
+    org.springframework.web: ERROR
+    com.howtodoinjava: DEBUG
+    org.hibernate: ERROR
